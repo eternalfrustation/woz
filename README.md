@@ -6,7 +6,7 @@ The Goal of this project is to get a working operating system up and running
 
 The following things are the bare minimum
 
-- Booting Up on x86_64
+- Booting Up on x86
 - Able to use the CPU, RAM, Display, Keyboard
 - Printing on the screen
 - Memory management
@@ -16,6 +16,7 @@ The following things are the bare minimum
 - File system access
 - Providing Modules Support
 - Mouse Support
+- Booting Up on x86_64
 
 The following is are the Goals after acheiving the above
 
