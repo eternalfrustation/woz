@@ -2,13 +2,18 @@
 
 The Goal of this project is to get a working operating system up and running
 
+## What can it do right now
+
+- Boot Up on risc V
+- Print Hello world on Serial Console
+
 ## What is 'Working' defined as
 
 The following things are the bare minimum
 
-- Booting Up on x86
-- Able to use the CPU, RAM, Display, Keyboard
-- Printing on the screen
+- Booting Up on RiscV
+- Using VGA
+- Able to use the Multi Core CPU, RAM, Display, Keyboard
 - Memory management
 - Multiprocess support
 - Running executables
