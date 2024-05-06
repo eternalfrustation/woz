@@ -1,4 +1,3 @@
-const uart = @import("uart.zig");
 const debug = @import("opensbi/debug.zig");
 export fn _start() callconv(.Naked) noreturn {
     asm volatile (
