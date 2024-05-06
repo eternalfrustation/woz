@@ -15,6 +15,9 @@ pub fn build(b: *std.Build) void {
     var enabledFeatures = Feature.Set.empty;
     disabledFeatures.addFeature(@intFromEnum(features.v));
     enabledFeatures.addFeature(@intFromEnum(features.m));
+    enabledFeatures.addFeature(@intFromEnum(features.a));
+    enabledFeatures.addFeature(@intFromEnum(features.c));
+    enabledFeatures.addFeature(@intFromEnum(features.zicsr));
 
     const arch = Target.Cpu.Arch.riscv64;
     const osTag = Target.Os.Tag.freestanding;
@@ -30,7 +33,7 @@ pub fn build(b: *std.Build) void {
     kernel_step.dependOn(&kernel.step);
 
     const kernel_path = b.fmt("{s}/{s}", .{ b.exe_dir, kernel.out_filename });
-    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-machine", "virt", "-bios", kernel_path };
+    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-machine", "virt", "-kernel", kernel_path };
 
     const run_cmd = b.addSystemCommand(&run_cmd_str);
     run_cmd.step.dependOn(b.getInstallStep());
