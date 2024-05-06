@@ -25,5 +25,6 @@ export fn _start() callconv(.Naked) noreturn {
 }
 
 export fn kmain() void {
-    _ = debug.kdebug_print("Hello");
+    _ = debug.kdebug_print("Hello") catch 0;
+    while (true) {}
 }
