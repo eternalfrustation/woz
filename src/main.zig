@@ -1,9 +1,6 @@
-const SERIAL_ADDR: *u8 = @ptrFromInt(0x10000000);
-
+const uart = @import("uart.zig");
 export fn _start() callconv(.Naked) noreturn {
     asm volatile (
-        \\ .section .init
-        \\
         \\ .option norvc
         \\
         \\ .type start, @function
@@ -32,11 +29,11 @@ export fn _start() callconv(.Naked) noreturn {
 
 export fn kmain() void {
     const str = "Hello world!";
-    kprint_uart(str, str.len);
-}
+    uart.kprint_uart(str, str.len);
 
-export fn kprint_uart(str: [*]const u8, len: usize) void {
-    for (0..len) |i| {
-        SERIAL_ADDR.* = str[i];
+    while (true) {
+        while (uart.kreadc_uart()) |c| {
+            uart.kputc_uart(c);
+        }
     }
 }

@@ -30,7 +30,7 @@ pub fn build(b: *std.Build) void {
     kernel_step.dependOn(&kernel.step);
 
     const kernel_path = b.fmt("{s}/{s}", .{ b.exe_dir, kernel.out_filename });
-    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-machine", "virt", "-bios", kernel_path };
+    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-machine", "virt", "-bios", kernel_path };
 
     const run_cmd = b.addSystemCommand(&run_cmd_str);
     run_cmd.step.dependOn(b.getInstallStep());
