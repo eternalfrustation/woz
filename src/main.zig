@@ -1,4 +1,5 @@
 const debug = @import("opensbi/debug.zig");
+const reset = @import("opensbi/reset.zig");
 export fn _start() callconv(.Naked) noreturn {
     asm volatile (
         \\ .option norvc
@@ -29,6 +30,13 @@ export fn kmain() void {
     while (true) {
         var a = [10]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         _ = debug.read_str(&a) catch continue;
+        for (a) |c| {
+            if (c == ';') {
+                _ = reset.system_reset(reset.ResetType.COLD_REBOOT, reset.ResetReason.NO_REASON) catch {
+                    _ = debug.print("\nCouldn't restart\n") catch unreachable;
+                };
+            }
+        }
         _ = debug.print(&a) catch continue;
     }
 }
