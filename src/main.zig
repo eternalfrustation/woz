@@ -26,6 +26,12 @@ export fn _start() callconv(.Naked) noreturn {
 }
 
 export fn kmain() void {
+    const dtbp = asm (
+        \\
+        : [dtbp] "={a1}" (-> usize),
+    );
+    // Roll my own dtb parser?
+    _ = dtbp;
     _ = debug.print("Hello") catch 0;
     while (true) {
         var a = [10]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
