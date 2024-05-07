@@ -25,6 +25,10 @@ export fn _start() callconv(.Naked) noreturn {
 }
 
 export fn kmain() void {
-    _ = debug.kdebug_print("Hello") catch 0;
-    while (true) {}
+    _ = debug.print("Hello") catch 0;
+    while (true) {
+        var a: u8 = 0;
+        _ = debug.read_char(&a) catch continue;
+        _ = debug.write_char(a) catch continue;
+    }
 }
