@@ -28,6 +28,28 @@ pub fn print(s: []const u8) !usize {
     };
 }
 
+pub fn read_str(arr: []const u8) !usize {
+    const err_code = asm (
+        \\ li a7, 0x4442434E
+        \\ li a6, 0x1
+        \\ li a2, 0
+        \\ ecall
+        : [err] "={a0}" (-> isize),
+        : [len] "{a0}" (arr.len),
+          [ptr] "{a1}" (arr.ptr),
+    );
+    // temporary fix till zig supports multiple return values from assembly
+    const value = asm (
+        \\
+        : [val] "={a1}" (-> usize),
+    );
+    return switch (err_code) {
+        0 => value,
+        -9...-1 => common.err_from_int(err_code),
+        else => unreachable,
+    };
+}
+
 pub fn read_char(a: *u8) !usize {
     const err_code = asm (
         \\ li a7, 0x4442434E
