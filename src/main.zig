@@ -1,5 +1,7 @@
 const debug = @import("opensbi/debug.zig");
+const Header = @import("dtb/traverser.zig").Header;
 const reset = @import("opensbi/reset.zig");
+
 export fn _start() callconv(.Naked) noreturn {
     asm volatile (
         \\ .option norvc
@@ -25,13 +27,16 @@ export fn _start() callconv(.Naked) noreturn {
     while (true) {}
 }
 
-export fn kmain() void {
+export fn kmain() noreturn {
     const dtbp = asm (
         \\
         : [dtbp] "={a1}" (-> usize),
     );
-    // Roll my own dtb parser?
-    _ = dtbp;
+    _ = debug.printHex(usize, dtbp) catch unreachable;
+
+    const h = Header.fromAddress(dtbp) catch unreachable;
+    _ = debug.write_char('\n') catch unreachable;
+    _ = debug.printHex(Header, h.*) catch unreachable;
     _ = debug.print("Hello") catch 0;
     while (true) {
         var a = [10]u8{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

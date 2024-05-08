@@ -1,3 +1,5 @@
+const bufPrint = @import("std").fmt.bufPrint;
+const bufPrintError = @import("std").fmt.BufPrintError;
 const std = @import("std");
 const common = @import("../opensbi.zig");
 // a7 has the extension id
@@ -6,6 +8,38 @@ const common = @import("../opensbi.zig");
 // ecall to finally call the function
 // a0 has the return code
 // a1 has the return value
+
+pub fn printHex(comptime T: type, x: T) !usize {
+    const bytes_len = @bitSizeOf(T) / 8;
+    comptime {
+        if (bytes_len < 1) {
+            @compileError("Can't print hex of zero sized type");
+        }
+    }
+    for (0..bytes_len, std.mem.asBytes(&x)) |i, b| {
+        const lowerBytes: u4 = @truncate(b & 0b00001111);
+        const upperBytes: u4 = @truncate((b & 0b11110000) >> 4);
+        _ = try write_char(toHex(upperBytes));
+        _ = try write_char(toHex(lowerBytes));
+        if (i % 4 != 3) {
+            _ = try write_char(' ');
+        } else if (i % 8 != 7) {
+            _ = try write_char('\t');
+        } else {
+            _ = try write_char('\n');
+        }
+    }
+    return bytes_len * 3 - 1;
+}
+
+pub fn toHex(x: u4) u8 {
+    if (x > 9) {
+        return 'A' + @as(u8, x - 10);
+    } else {
+        return '0' + @as(u8, x);
+    }
+}
+
 pub fn print(s: []const u8) !usize {
     const err_code = asm (
         \\ li a7, 0x4442434E

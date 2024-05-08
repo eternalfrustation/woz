@@ -8,7 +8,7 @@ pub const ResetType = enum(u32) {
 
 pub const ResetReason = enum(u32) { NO_REASON = 0x0, SYSTEM_FAILURE = 0x1 };
 
-pub fn system_reset(reset_type: ResetType, reset_reason: ResetReason) !usize {
+pub fn system_reset(reset_type: ResetType, reset_reason: ResetReason) !noreturn {
     const err_code = asm (
         \\ li a7, 0x53525354
         \\ li a6, 0x0
