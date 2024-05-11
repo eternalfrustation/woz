@@ -10,13 +10,8 @@ const common = @import("../opensbi.zig");
 // a1 has the return value
 
 pub fn printHex(comptime T: type, x: T) !usize {
-    const bytes_len = @bitSizeOf(T) / 8;
-    comptime {
-        if (bytes_len < 1) {
-            @compileError("Can't print hex of zero sized type");
-        }
-    }
-    for (0..bytes_len, std.mem.asBytes(&x)) |i, b| {
+    const bytes = std.mem.asBytes(&x);
+    for (0..bytes.len, bytes) |i, b| {
         const lowerBytes: u4 = @truncate(b & 0b00001111);
         const upperBytes: u4 = @truncate((b & 0b11110000) >> 4);
         _ = try write_char(toHex(upperBytes));
@@ -29,7 +24,7 @@ pub fn printHex(comptime T: type, x: T) !usize {
             _ = try write_char('\n');
         }
     }
-    return bytes_len * 3 - 1;
+    return bytes.len * 3 - 1;
 }
 
 pub fn toHex(x: u4) u8 {

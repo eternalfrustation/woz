@@ -1,3 +1,4 @@
+// Built with zig 0.12.0
 const std = @import("std");
 const Builder = @import("std").build.Builder;
 const Target = @import("std").Target;
@@ -33,7 +34,7 @@ pub fn build(b: *std.Build) void {
     kernel_step.dependOn(&kernel.step);
 
     const kernel_path = b.fmt("{s}/{s}", .{ b.exe_dir, kernel.out_filename });
-    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-machine", "virt", "-smp", "4", "-m", "2G", "-kernel", kernel_path, "-object", "rng-random,filename=/dev/urandom,id=rng0", "-device", "virtio-rng-device,rng=rng0", "-device", "virtio-net-device,netdev=usernet", "-netdev", "user,id=usernet,hostfwd=tcp::10000-:22" };
+    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-machine", "virt", "-dtb", "virt.dtb", "-smp", "4", "-m", "2G", "-kernel", kernel_path, "-object", "rng-random,filename=/dev/urandom,id=rng0", "-device", "virtio-rng-device,rng=rng0", "-device", "virtio-net-device,netdev=usernet", "-netdev", "user,id=usernet,hostfwd=tcp::10000-:22" };
 
     const run_cmd = b.addSystemCommand(&run_cmd_str);
     run_cmd.step.dependOn(b.getInstallStep());
