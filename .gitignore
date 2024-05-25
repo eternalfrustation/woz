@@ -1,2 +1,6 @@
 zig-cache/
+*.dtb
+*.dts
+*.log
+*/*.log
 zig-out/

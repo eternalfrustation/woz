@@ -1,9 +1,8 @@
 ENTRY(_start)
 
-. = 0x0000000080040000;
 
 SECTIONS {
-
+	. = 0x82000000;
 	.text : ALIGN(4K) {
 		*(.text)
 	}
@@ -11,9 +10,9 @@ SECTIONS {
 	.bss : ALIGN(4K) {
 		PROVIDE(bss_start = .);
 		*(.bss);
-		. += 4096;
+		. += 1M;
 		PROVIDE(stack_top = .);
-		. += 4096;
+		. += 1M;
 		PROVIDE(global_pointer = .);
 		PROVIDE(bss_end = .);
 	}
