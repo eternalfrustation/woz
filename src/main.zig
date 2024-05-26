@@ -43,7 +43,7 @@ export fn kmain() noreturn {
     );
     _ = debug.printHex(usize, dtbp) catch unreachable;
 
-    var printBuffer: [512]u8 = undefined;
+    var printBuffer: [2048]u8 = undefined;
     const dtb_header = traverser.GenericFromAddress(traverser.Header, u32, dtbp);
     _ = debug.write_char('\n') catch unreachable;
     _ = debug.printHex(traverser.Header, dtb_header) catch unreachable;
@@ -77,6 +77,7 @@ export fn kmain() noreturn {
         switch (token) {
             traverser.RawFdtToken.FDT_END => {
                 out = std.fmt.bufPrint(&printBuffer, "\nFDT_END\n", .{}) catch unreachable;
+                offset += 4;
                 break;
             },
             traverser.RawFdtToken.FDT_END_NODE => {
