@@ -53,7 +53,6 @@ export fn kmain() noreturn {
     _ = debug.print(out) catch 0;
     const struct_dtp = dtbp + dtb_header.off_dt_struct;
     const strings_dtp = dtbp + dtb_header.off_dt_strings;
-    _ = strings_dtp; // autofix
     var mem_rsvmap = dtbp + dtb_header.off_mem_rsvmap;
     out = std.fmt.bufPrint(&printBuffer, "Memory Reserve Map Address of dtb: {X}\n", .{mem_rsvmap}) catch unreachable;
     _ = debug.print(out) catch 0;
@@ -94,7 +93,7 @@ export fn kmain() noreturn {
                 offset += 4 + name_len + (4 - name_len % 4) % 4;
             },
             traverser.RawFdtToken.FDT_PROP => |prop_token| {
-                out = std.fmt.bufPrint(&printBuffer, "\nFDT_PROP, {}\n", .{prop_token}) catch unreachable;
+                out = std.fmt.bufPrint(&printBuffer, "\nFDT_PROP, {}\nName: {s}\n", .{ prop_token, @as([*:0]u8, @ptrFromInt(prop_token.nameoff + strings_dtp)) }) catch unreachable;
                 offset += 4 + 8 + prop_token.value.len + (4 - prop_token.value.len % 4) % 4;
             },
         }

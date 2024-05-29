@@ -34,7 +34,12 @@ pub fn build(b: *std.Build) void {
     kernel_step.dependOn(&kernel.step);
 
     const kernel_path = b.fmt("{s}/{s}", .{ b.exe_dir, kernel.out_filename });
-    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-s", "-S", "-chardev", "stdio,id=char0,logfile=serial.log,signal=off", "-serial", "chardev:char0", "-machine", "virt", "-smp", "4", "-m", "2G", "-kernel", kernel_path, "-object", "rng-random,filename=/dev/urandom,id=rng0", "-device", "virtio-rng-device,rng=rng0", "-device", "virtio-net-device,netdev=usernet", "-netdev", "user,id=usernet,hostfwd=tcp::10000-:22" };
+    const hda_step = b.step("init_hda", "Init HDA");
+    const hda_path = b.fmt("{s}/hdd.img", .{b.exe_dir});
+    const hda = b.addSystemCommand(&[_][]const u8{ "qemu-img", "create", "-f", "qcow2", hda_path, "100M" });
+    hda.step.dependOn(b.getInstallStep());
+    hda_step.dependOn(&hda.step);
+    const run_cmd_str = [_][]const u8{ "qemu-system-riscv64", "-hda", hda_path, "-device", "VGA", "-s", "-S", "-chardev", "stdio,id=char0,logfile=serial.log,signal=off", "-serial", "chardev:char0", "-machine", "virt", "-smp", "4", "-m", "2G", "-kernel", kernel_path, "-object", "rng-random,filename=/dev/urandom,id=rng0", "-device", "virtio-rng-device,rng=rng0", "-device", "virtio-net-device,netdev=usernet", "-netdev", "user,id=usernet,hostfwd=tcp::10000-:22" };
 
     const run_cmd = b.addSystemCommand(&run_cmd_str);
     run_cmd.step.dependOn(b.getInstallStep());
