@@ -51,9 +51,6 @@ pub const RawFdtToken = union(enum) {
     FDT_END_NODE: void,
     pub fn FromAddress(a: usize) !RawFdtToken {
         const token_identifier: u32 = GenericFromAddress(u32, u32, a);
-        var printBuffer: [256]u8 = undefined;
-        const out = std.fmt.bufPrint(&printBuffer, "\ntoken identifier: {}\n", .{token_identifier}) catch unreachable;
-        _ = debug.print(out) catch 0;
 
         switch (token_identifier) {
             0x00000001 => {

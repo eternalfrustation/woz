@@ -7,6 +7,10 @@ The Goal of this project is to get a working operating system up and running
 - Boot Up on risc V
 - Print Hello world on Serial Console
 
+## Immediate Next Target
+
+- Enumerate PCI Devices
+
 ## What is 'Working' defined as
 
 The following things are the bare minimum
