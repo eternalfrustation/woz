@@ -1,31 +1,44 @@
-const debug = @import("opensbi/debug.zig");
+// Using the entry point from init.S
+
 const std = @import("std");
+
 const traverser = @import("dtb/traverser.zig");
+const debug = @import("opensbi/debug.zig");
 const reset = @import("opensbi/reset.zig");
 
-export fn _start() callconv(.Naked) noreturn {
-    asm volatile (
-        \\ .option norvc
-        \\
-        \\ .option push
-        \\ .option norelax
-        \\      la gp, global_pointer
-        \\  .option pop
-        \\      csrw satp, zero
-        \\      la sp, stack_top
-        \\      la t5, bss_start
-        \\      la t6, bss_end
-        \\      mv t0, a1
-        \\
-        \\      bss_clear:
-        \\          sd zero, (t5)
-        \\          addi t5, t5, 8
-        \\          bltu t5, t6, bss_clear
-        \\
-        \\          tail kmain
-        \\      .end
-    );
+pub const panic = std.debug.FullPanic(kernelPanic);
+
+fn kernelPanic(msg: []const u8, first_trace_addr: ?usize) noreturn {
+    _ = first_trace_addr;
+    _ = debug.print("Panic! \n") catch 0;
+    _ = debug.print(msg) catch 0;
     while (true) {}
+}
+
+pub const std_options: std.Options = .{
+    // This is the logging function used by `std.log`.
+    .logFn = kLog,
+};
+
+/// This fking sucks, need to be improved
+/// TODO: Implement a way to parse scope
+fn kLog(
+    comptime level: std.log.Level,
+    // Scope
+    comptime _: @Type(.enum_literal),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    // We could do anything we want here!
+    // ...but actually, let's just call the default implementation.
+    debug.print("kLog {");
+    debug.print(level.asText());
+    const message: [1000]u8 = undefined;
+
+    std.fmt.bufPrint(message, format, args);
+
+    const line: [1200]u8 = undefined;
+    std.fmt.bufPrint(line, "kLog {}: {}\n", level.asText(), message);
 }
 
 fn strlen(str: [*:0]const u8) usize {

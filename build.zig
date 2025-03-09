@@ -2,7 +2,7 @@
 const std = @import("std");
 const Builder = @import("std").build.Builder;
 const Target = @import("std").Target;
-const CrossTarget = @import("std").zig.CrossTarget;
+const Query = @import("std").Target.Query;
 const Feature = @import("std").Target.Cpu.Feature;
 const LazyPath = @import("std").Build.LazyPath;
 const CodeModel = @import("std").builtin.CodeModel;
@@ -23,11 +23,14 @@ pub fn build(b: *std.Build) void {
     const arch = Target.Cpu.Arch.riscv64;
     const osTag = Target.Os.Tag.freestanding;
     const abi = Target.Abi.none;
-    const targetQuery = CrossTarget{ .cpu_arch = arch, .os_tag = osTag, .abi = abi, .cpu_features_sub = disabledFeatures, .cpu_features_add = enabledFeatures };
+    const targetQuery = Query{ .cpu_arch = arch, .os_tag = osTag, .abi = abi, .cpu_features_sub = disabledFeatures, .cpu_features_add = enabledFeatures };
 
-    const target = Target{ .abi = abi, .cpu = Target.Cpu.baseline(arch), .os = Target.Os{ .tag = osTag, .version_range = Target.Os.VersionRange.default(osTag, arch) }, .ofmt = Target.ObjectFormat.elf };
-    const kernel = b.addExecutable(.{ .name = "kernel.elf", .root_source_file = LazyPath{ .path = "src/main.zig" }, .target = .{ .query = targetQuery, .result = target }, .code_model = CodeModel.medium });
-    kernel.setLinkerScript(.{ .path = "src/linker.ld" });
+    const os = Target.Os{ .tag = osTag, .version_range = Target.Os.VersionRange.default(arch, osTag, abi) };
+
+    const target = Target{ .abi = abi, .cpu = Target.Cpu.baseline(arch, os), .os = os, .ofmt = Target.ObjectFormat.elf };
+    const kernel = b.addExecutable(.{ .name = "kernel.elf", .root_source_file = LazyPath{ .src_path = .{ .owner = b, .sub_path = "src/main.zig" } }, .target = .{ .query = targetQuery, .result = target }, .code_model = CodeModel.medium });
+    kernel.addAssemblyFile(LazyPath{ .src_path = .{ .owner = b, .sub_path = "src/init.S" } });
+    kernel.setLinkerScript(LazyPath{ .src_path = .{ .owner = b, .sub_path = "src/linker.ld" } });
     b.installArtifact(kernel);
 
     const kernel_step = b.step("kernel", "Build the kernel");

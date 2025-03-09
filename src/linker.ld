@@ -1,8 +1,9 @@
-ENTRY(_start)
-
+ENTRY(_entry);
 
 SECTIONS {
 	. = 0x82000000;
+
+
 	.text : ALIGN(4K) {
 		*(.text)
 	}

@@ -5,3 +5,5 @@ zig-cache/
 *.log
 */*.log
 zig-out/
+.zig-cache/
+.gdb_history
